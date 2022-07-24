@@ -1,0 +1,29 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+     runs-on: ubuntu-latest
+     steps:
+      - uses: appleboy/ssh-action@master
+        name: executing remote ssh commands using password
+        with:
+         host: ${{secrets.SSH_HOST}}
+         key: ${{secrets.SSH_KEY}}
+         username: ${{secrets.SSH_USERNAME}} 
+
+         script: |
+          cd /var/www/html/mamba-ico-nodejs/Creamy-NodeJS
+          git stash 
+          git pull origin main
+              source /root/.nvm/nvm.sh 
+              npm install
+              npm install pm2
+              pm2 stop Index.js
+              pm2 start Index.js
+              pm2 restart Index.js
